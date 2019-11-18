@@ -51,9 +51,6 @@ from libsemigroups_cppyy.schreier_sims import SchreierSims
 from cppyy.gbl import PythonElement
 from cppyy.gbl.libsemigroups import ReportGuard
 
-# Untested
-
-
 # from cppyy.gbl.libsemigroups import PBR, Bipartition, RWS
 #
 # def rules(rws):
