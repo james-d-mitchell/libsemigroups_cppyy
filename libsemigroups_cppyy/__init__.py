@@ -21,6 +21,7 @@ from cppyy.gbl import std
 import libsemigroups_cppyy.detail
 from libsemigroups_cppyy.adapters import *
 
+cppyy.add_include_path("/usr/local/include/")
 cppyy.load_library("libsemigroups")
 
 cppyy.cppdef("#define FMT_HEADER_ONLY")
