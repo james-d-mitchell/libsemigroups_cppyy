@@ -31,6 +31,7 @@ cppyy.include("libsemigroups/bmat8.hpp")
 cppyy.include("libsemigroups/element.hpp")
 cppyy.include("libsemigroups/element-helper.hpp")
 cppyy.include("libsemigroups/froidure-pin.hpp")
+cppyy.include("libsemigroups/knuth-bendix.hpp")
 cppyy.include("libsemigroups/schreier-sims.hpp")
 cppyy.include("libsemigroups/report.hpp")
 
@@ -44,13 +45,7 @@ from libsemigroups_cppyy.perm import *
 from libsemigroups_cppyy.froidure_pin import FroidurePin
 from libsemigroups_cppyy.schreier_sims import SchreierSims
 from libsemigroups_cppyy.digraph import ActionDigraph
+from libsemigroups_cppyy.knuth_bendix import KnuthBendix
 
 from cppyy.gbl import PythonElement
 from cppyy.gbl.libsemigroups import ReportGuard
-
-# from cppyy.gbl.libsemigroups import PBR, Bipartition, RWS
-#
-# def rules(rws):
-#     if not isinstance(rws, cppyy.gbl.libsemigroups.RWS):
-#         raise TypeError()
-#     return [list(x) for x in rws.rules()]

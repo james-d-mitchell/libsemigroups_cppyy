@@ -15,7 +15,7 @@ def PartialPerm(*args):
     if len(args) == 1:
         pperm_type = cppyy.gbl.libsemigroups.PPermHelper(len(args[0])).type
         ## Workaround CPPYY issue
-        if pperm_type.__module__ == 'cppyy.gbl.HPCombi':
+        if pperm_type.__module__ == "cppyy.gbl.HPCombi":
             images = list(args[0])
             images += range(len(images), 16)
             ret = pperm_type(images)
@@ -35,7 +35,7 @@ def PartialPerm(*args):
         x.ran(),
         Degree(x),
     )
-    if pperm_type.__module__ == 'cppyy.gbl.HPCombi':
+    if pperm_type.__module__ == "cppyy.gbl.HPCombi":
         pperm_type.rank = pperm_type.rank
     else:
         pperm_type.rank = pperm_type.crank
