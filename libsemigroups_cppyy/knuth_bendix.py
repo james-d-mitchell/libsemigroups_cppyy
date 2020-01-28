@@ -1,5 +1,5 @@
 """
-This file contains the interface to libsemigroups adapters; see
+This file contains the interface to libsemigroups KnuthBendix; see
 
     https://libsemigroups.readthedocs.io/en/latest/_generated/libsemigroups__fpsemigroup__knuthbendix.html
 

@@ -32,6 +32,7 @@ cppyy.include("libsemigroups/bmat8.hpp")
 cppyy.include("libsemigroups/element.hpp")
 cppyy.include("libsemigroups/element-helper.hpp")
 cppyy.include("libsemigroups/froidure-pin.hpp")
+cppyy.include("libsemigroups/fpsemi.hpp")
 cppyy.include("libsemigroups/knuth-bendix.hpp")
 cppyy.include("libsemigroups/schreier-sims.hpp")
 cppyy.include("libsemigroups/report.hpp")
@@ -43,6 +44,7 @@ from libsemigroups_cppyy.bmat import *
 from libsemigroups_cppyy.pperm import *
 from libsemigroups_cppyy.transf import *
 from libsemigroups_cppyy.perm import *
+from libsemigroups_cppyy.fpsemi import FpSemigroup
 from libsemigroups_cppyy.froidure_pin import FroidurePin
 from libsemigroups_cppyy.schreier_sims import SchreierSims
 from libsemigroups_cppyy.digraph import ActionDigraph
