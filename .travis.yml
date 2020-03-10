@@ -4,11 +4,11 @@ services:
   - docker
 
 before_install:
-- docker pull libsemigroups/libsemigroups-cppyy
-- ID=$(docker run --rm -i -t -d libsemigroups/libsemigroups-cppyy)
+- docker pull libsemigroups/libsemigroups_cppyy
+- ID=$(docker run --rm -i -t -d libsemigroups/libsemigroups_cppyy)
 - docker cp . "$ID":/home/libsemigroups/libsemigroups_cppyy_github
 - docker exec -it "$ID" sudo chown 1000:1000 -R ../libsemigroups_cppyy_github
 
 script:
-- docker exec -it "$ID" /bin/sh -c "cd ../libsemigroups_cppyy_github ; tox -- -x tests ; exit"
+- docker exec -it "$ID" /bin/sh -c "cd ../libsemigroups_cppyy_github && tox -- -x tests && exit"
 - docker stop "$ID"
