@@ -38,12 +38,12 @@ Refer to demo.ipynb for more functionality.
 
 If you have [Docker](https://www.docker.com) installed, you can download this container using:
 ~~~
-docker pull libsemigroups/libsemigroups-cppyy
+docker pull libsemigroups/libsemigroups_cppyy
 ~~~
 
 The docker container for `libsemigroups_cppyy` can be started by typing:
 ~~~
-docker run --rm -it libsemigroups/libsemigroups-cppyy
+docker run --rm -it libsemigroups/libsemigroups_cppyy
 ~~~
 and in the docker container you can start python by typing:
 ~~~
