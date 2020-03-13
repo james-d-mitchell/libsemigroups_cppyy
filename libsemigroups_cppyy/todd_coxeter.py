@@ -9,15 +9,6 @@ for further details.
 import cppyy
 import libsemigroups_cppyy.detail as detail
 
-cppyy.cppdef(
-    """
-    libsemigroups::congruence::ToddCoxeter
-    make_todd_coxeter(libsemigroups::congruence_type t) {
-      return libsemigroups::congruence::ToddCoxeter(t);
-    } 
-    """
-    )
-
 def ToddCoxeter(t):
     if not isinstance(t, str):
         raise TypeError('Expected a string as the argument')
@@ -29,4 +20,4 @@ def ToddCoxeter(t):
         t = cppyy.gbl.libsemigroups.congruence_type.twosided
     else:
         raise ValueError('Expected one of "right", "left" and "twosided"')
-    return cppyy.gbl.make_todd_coxeter(t)
+    return cppyy.gbl.libsemigroups.congruence.ToddCoxeter(t)
