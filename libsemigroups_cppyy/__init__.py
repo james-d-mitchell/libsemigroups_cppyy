@@ -46,6 +46,8 @@ cppyy.include("libsemigroups/kbe.hpp")
 cppyy.include("libsemigroups/knuth-bendix.hpp")
 cppyy.include("libsemigroups/schreier-sims.hpp")
 cppyy.include("libsemigroups/report.hpp")
+cppyy.include("libsemigroups/todd-coxeter.hpp")
+cppyy.include("libsemigroups/cong-intf.hpp")
 
 cppyy.include("include/python_element.h")
 
@@ -60,6 +62,7 @@ from libsemigroups_cppyy.schreier_sims import SchreierSims
 from libsemigroups_cppyy.digraph import ActionDigraph
 from libsemigroups_cppyy.knuth_bendix import KnuthBendix
 from libsemigroups_cppyy.cong_pair import CongruenceByPairs
+from libsemigroups_cppyy.todd_coxeter import ToddCoxeter
 
 from cppyy.gbl import PythonElement
 from cppyy.gbl.libsemigroups import ReportGuard
