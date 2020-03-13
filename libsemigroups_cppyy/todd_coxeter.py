@@ -8,6 +8,7 @@ for further details.
 
 import cppyy
 import libsemigroups_cppyy.detail as detail
+import cppyy.ll as ll
 
 def ToddCoxeter(t):
     if not isinstance(t, str):
@@ -20,4 +21,23 @@ def ToddCoxeter(t):
         t = cppyy.gbl.libsemigroups.congruence_type.twosided
     else:
         raise ValueError('Expected one of "right", "left" and "twosided"')
-    return cppyy.gbl.libsemigroups.congruence.ToddCoxeter(t)
+    tc_type = cppyy.gbl.libsemigroups.congruence.ToddCoxeter
+    def nr_gens_str(x):
+        undef = ll.static_cast["size_t"](cppyy.gbl.libsemigroups.UNDEFINED)
+        if x.nr_generators() == undef:
+            return "-"
+        else:
+            return str(x.nr_generators())
+    tc_type.__repr__ = (
+        lambda x: "<ToddCoxeter object %s generators and %d pair"
+        % (nr_gens_str(x), x.nr_generating_pairs()) +
+        "s"[:x.nr_generating_pairs() != 1] + ">"
+    )
+    def wrap_strategy(t):
+        if t == "felsch":
+            return
+            cppyy.gbl.libsemigroups.congruence.ToddCoxeter.policy.strategy.felsch
+    #detail.wrap_input(tc_type, tc_type.strategy, wrap_strategy)
+            
+    
+    return tc_type(t)
