@@ -10,6 +10,7 @@ import cppyy
 import libsemigroups_cppyy.detail as detail
 import cppyy.ll as ll
 
+
 def ToddCoxeter(t):
     if not isinstance(t, str):
         raise TypeError('Expected a string as the argument')
@@ -21,7 +22,9 @@ def ToddCoxeter(t):
         t = cppyy.gbl.libsemigroups.congruence_type.twosided
     else:
         raise ValueError('Expected one of "right", "left" and "twosided"')
+
     tc_type = cppyy.gbl.libsemigroups.congruence.ToddCoxeter
+
     def nr_gens_str(x):
         undef = ll.static_cast["size_t"](cppyy.gbl.libsemigroups.UNDEFINED)
         if x.nr_generators() == undef:
@@ -33,11 +36,19 @@ def ToddCoxeter(t):
         % (nr_gens_str(x), x.nr_generating_pairs()) +
         "s"[:x.nr_generating_pairs() != 1] + ">"
     )
-    def wrap_strategy(t):
-        if t == "felsch":
-            return
-            cppyy.gbl.libsemigroups.congruence.ToddCoxeter.policy.strategy.felsch
-    #detail.wrap_input(tc_type, tc_type.strategy, wrap_strategy)
-            
-    
+
+    def wrap_strategy(*args):
+        if len(args) == 0:
+            return [None], "";
+        overload = "libsemigroups::congruence::ToddCoxeter::policy::strategy"
+        # TODO check there's only 1 argument
+        if args[0] == "felsch":
+            return [tc_type.policy.strategy.felsch], overload
+        elif args[0] == "hlt":
+            return [tc_type.policy.strategy.hlt], overload
+        # TODO check for "random"
+        # TODO check for none of the above, and throw an exception in that case
+
+    #detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
+
     return tc_type(t)
