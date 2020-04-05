@@ -22,7 +22,9 @@ def __bits(n):
 
 
 BMat8.__repr__ = lambda x: cppyy.gbl.libsemigroups.detail.to_string(x)
-detail.unwrap(BMat8, BMat8.rows, lambda x: [__bits(ord(y)) for y in x])
+detail.unwrap_return_value(
+    BMat8, BMat8.rows, lambda self, x: [__bits(ord(y)) for y in x]
+)
 
 
 def BooleanMat(mat):
@@ -33,5 +35,6 @@ def BooleanMat(mat):
             v.push_back(x)
         out.push_back(v)
     bmat_type = cppyy.gbl.libsemigroups.BMatHelper(len(mat)).type
+    bmat_type.short_name = "BooleanMat"
     bmat_type.__pow__ = detail.generic_pow
     return bmat_type(out)

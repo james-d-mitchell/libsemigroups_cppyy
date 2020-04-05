@@ -17,6 +17,7 @@ def Transformation(images):
     transf_type.__pow__ = detail.generic_pow
     transf_type.__mul__ = Product
     transf_type.__repr__ = lambda x: "Transformation(%s)" % (x.ran())
+    transf_type.short_name = "Transformation"
     transf_type.ran = lambda x: [
         x[y] if isinstance(x[y], int) else ord(x[y]) for y in range(Degree(x))
     ]

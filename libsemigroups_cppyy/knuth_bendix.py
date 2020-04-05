@@ -29,13 +29,16 @@ def KnuthBendix():
         len(x.alphabet()),
         x.nr_active_rules(),
     )
-    detail.unwrap(kb_type, kb_type.active_rules, lambda x: [list(y) for y in list(x)])
-    detail.unwrap(kb_type, kb_type.cbegin_rules, lambda x: iter(x))
-    detail.unwrap(kb_type, kb_type.cend_rules, lambda x: iter(x))
-    detail.unwrap(
+    detail.unwrap_return_value(
+        kb_type, kb_type.active_rules, lambda self, x: [list(y) for y in list(x)]
+    )
+    # FIXME these don't work
+    # detail.unwrap(kb_type, kb_type.cbegin_rules, lambda self, x: iter(x))
+    # detail.unwrap(kb_type, kb_type.cend_rules, lambda self, x: iter(x))
+    detail.unwrap_return_value(
         kb_type,
         kb_type.froidure_pin,
-        cppyy.gbl.libsemigroups_cppyy.knuth_bendix_froidure_pin,
+        lambda self, x: cppyy.gbl.libsemigroups_cppyy.knuth_bendix_froidure_pin(x),
     )
 
     return kb_type()

@@ -24,4 +24,5 @@ def Permutation(images):
     if perm_type.__module__ == "cppyy.gbl.HPCombi":
         images = list(images)
         images += range(len(images), 16)
+    perm_type.short_name = "Permutation"
     return perm_type(images)

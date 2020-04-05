@@ -26,6 +26,11 @@ def PartialPerm(*args):
             raise TypeError("the third parameter must be an integer")
         pperm_type = cppyy.gbl.libsemigroups.PPermHelper(args[2]).type
         ret = pperm_type(*args)
+    else:
+        raise TypeError(
+            "wrong number of arguments, there must 1 or 3, found %d" % len(args)
+        )
+
     pperm_type.__pow__ = detail.generic_pow
     pperm_type.__mul__ = Product
     pperm_type.dom = lambda x: [y for y in range(Degree(x)) if ord(x[y]) != 255]
@@ -39,4 +44,5 @@ def PartialPerm(*args):
         pperm_type.rank = pperm_type.rank
     else:
         pperm_type.rank = pperm_type.crank
+    pperm_type.short_name = "PartialPerm"
     return ret
