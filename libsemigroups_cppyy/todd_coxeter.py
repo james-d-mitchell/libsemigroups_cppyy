@@ -32,8 +32,8 @@ def ToddCoxeter(t):
         else:
             return str(x.nr_generators())
     tc_type.__repr__ = (
-        lambda x: "<ToddCoxeter object %s generators and %d pair"
-        % (nr_gens_str(x), x.nr_generating_pairs()) +
+        lambda x: "<ToddCoxeter object %s generator" % (nr_gens_str(x)) +
+        "s"[:x.nr_generators() != 1] + " and %d pair" % (x.nr_generating_pairs()) +
         "s"[:x.nr_generating_pairs() != 1] + ">"
     )
 
@@ -49,6 +49,6 @@ def ToddCoxeter(t):
         # TODO check for "random"
         # TODO check for none of the above, and throw an exception in that case
 
-    #detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
+    detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
 
     return tc_type(t)
