@@ -41,13 +41,18 @@ def ToddCoxeter(t):
         if len(args) == 0:
             return [None], "";
         overload = "libsemigroups::congruence::ToddCoxeter::policy::strategy"
-        # TODO check there's only 1 argument
+        if len(args) != 1:
+            raise TypeError("Expected exactly 1 argument")
+        if not isinstance(args[0], str):
+            raise TypeError('Expected a string as the argument')
         if args[0] == "felsch":
             return [tc_type.policy.strategy.felsch], overload
         elif args[0] == "hlt":
             return [tc_type.policy.strategy.hlt], overload
-        # TODO check for "random"
-        # TODO check for none of the above, and throw an exception in that case
+        elif args[0] == "random":
+            return [tc_type.policy.strategy.random], overload
+        else:
+            raise ValueError('Expected one of "felsch", "hlt" and "random"')
 
     detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
 
