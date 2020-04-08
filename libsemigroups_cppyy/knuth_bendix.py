@@ -12,12 +12,11 @@ import libsemigroups_cppyy.detail as detail
 cppyy.cppdef(
     """
 namespace libsemigroups_cppyy {
-using FroidurePinKBE = typename
-libsemigroups::fpsemigroup::KnuthBendix::froidure_pin_type;
-  FroidurePinKBE&
+  libsemigroups::FroidurePin<libsemigroups::detail::KBE>&
   knuth_bendix_froidure_pin(
       std::shared_ptr<libsemigroups::FroidurePinBase> fp) {
-    return static_cast<FroidurePinKBE&>(*fp);
+    return static_cast<libsemigroups::FroidurePin<libsemigroups::detail::KBE>&>(
+        *fp);
   }
 }  // namespace libsemigroups_cppyy
 """
