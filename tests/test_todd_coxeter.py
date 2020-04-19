@@ -20,3 +20,10 @@ class TestToddCoxeter(unittest.TestCase):
             ToddCoxeter(45)
         with self.assertRaises(ValueError):
             ToddCoxeter("lft")
+        
+        tc = ToddCoxeter("left")
+        tc.set_nr_generators(1)
+        tc.add_pair([0, 0, 0, 0, 0, 0], [0, 0, 0])
+        self.assertEqual(tc.nr_classes(), 5)
+        self.assertEqual(tc.contains([0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]), True)
+        self.assertEqual(tc.contains([0, 0, 0], [0, 0]), False)
