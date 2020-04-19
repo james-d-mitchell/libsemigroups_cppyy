@@ -42,7 +42,7 @@ def ToddCoxeter(t):
             return [None], "";
         overload = "libsemigroups::congruence::ToddCoxeter::policy::strategy"
         if len(args) != 1:
-            raise TypeError("Expected exactly 1 argument")
+            raise TypeError('Expected exactly 1 argument')
         if not isinstance(args[0], str):
             raise TypeError('Expected a string as the argument')
         if args[0] == "felsch":
@@ -54,6 +54,23 @@ def ToddCoxeter(t):
         else:
             raise ValueError('Expected one of "felsch", "hlt" and "random"')
 
-    detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
+    def wrap_standardize(*args):
+        if len(args) == 0:
+            return [None], "";
+        overload = "libsemigroups::congruence::ToddCoxeter::order"
+        if len(args) != 1:
+            raise TypeError('Expected exactly 1 argument')
+        if not isinstance(args[0], str):
+            raise TypeError('Expected a string as the argument')
+        if args[0] == "lex":
+            return [tc_type.order.lex], overload
+        elif args[0] == "shortlex":
+            return [tc_type.order.shortlex], overload
+        elif args[0] == "recursive":
+            return [tc_type.order.recursive], overload
+        else:
+            raise ValueError('Expected "lex" as argument')
 
+    detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
+    detail.wrap_overload_input(tc_type, tc_type.standardize, wrap_standardize)
     return tc_type(t)
