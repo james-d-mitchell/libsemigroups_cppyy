@@ -32,7 +32,7 @@ def ToddCoxeter(t):
         else:
             return str(x.nr_generators())
     tc_type.__repr__ = (
-        lambda x: "<ToddCoxeter object %s generator" % (nr_gens_str(x)) +
+        lambda x: "<ToddCoxeter object: %s generator" % (nr_gens_str(x)) +
         "s"[:x.nr_generators() != 1] + " and %d pair" % (x.nr_generating_pairs()) +
         "s"[:x.nr_generating_pairs() != 1] + ">"
     )
@@ -71,6 +71,25 @@ def ToddCoxeter(t):
         else:
             raise ValueError('Expected "lex" as argument')
 
-    detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
-    detail.wrap_overload_input(tc_type, tc_type.standardize, wrap_standardize)
+    def int_to_kind(self, n):
+        if n == 0:
+            return "left"
+        elif n == 1:
+            return "right"
+        else:
+            return "twosided"        
+
+    detail.wrap_overload_input(
+        tc_type, tc_type.strategy, wrap_strategy
+    )
+    detail.wrap_overload_input(
+        tc_type, tc_type.standardize, wrap_standardize
+    )
+    
+    detail.unwrap_return_value(
+        tc_type, tc_type.kind, int_to_kind
+    )
+    detail.unwrap_return_value(
+        tc_type, tc_type.class_index_to_word, lambda self, x: list(x)
+    )
     return tc_type(t)

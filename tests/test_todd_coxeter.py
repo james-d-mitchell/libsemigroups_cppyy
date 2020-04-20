@@ -27,3 +27,5 @@ class TestToddCoxeter(unittest.TestCase):
         self.assertEqual(tc.nr_classes(), 5)
         self.assertEqual(tc.contains([0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]), True)
         self.assertEqual(tc.contains([0, 0, 0], [0, 0]), False)
+        self.assertEqual(tc.kind(), 'left')
+        self.assertEqual(tc.class_index_to_word(1), [0, 0])
