@@ -276,7 +276,7 @@ class TestFroidurePin(unittest.TestCase):
         self.assertEqual(S.sorted_at(51), Transformation([2, 0, 3, 4, 1]))
 
         if compare_version_numbers(libsemigroups_version(), "1.0.8"):
-            self.assertEqual(S.current_position(Transformation([2, 0, 3, 4, 1])), 15)
+            self.assertEqual(S.current_position(Transformation([2, 0, 3, 4, 1])), 10)
 
     def test_state(self):
         ReportGuard(False)
