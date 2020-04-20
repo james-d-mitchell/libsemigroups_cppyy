@@ -3,7 +3,6 @@ A minimal cppyy wrapper for the libsemigroups C++ library.
 """
 from setuptools import find_packages, setup
 
-<<<<<<< HEAD
 setup(
     name="libsemigroups_cppyy",
     version="0.0.1",
