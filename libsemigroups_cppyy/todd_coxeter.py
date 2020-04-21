@@ -41,25 +41,26 @@ def ToddCoxeter(t):
     )
 
     def wrap_strategy(*args):
-        if len(args) == 0:
-            return [None], ""
+        if len(args) == 1:
+            return [args[0]], ""
         overload = "libsemigroups::congruence::ToddCoxeter::policy::strategy"
-        if len(args) != 1:
+        if len(args) != 2:
             raise TypeError("Expected exactly 1 argument")
-        if not isinstance(args[0], str):
+        if not isinstance(args[1], str):
             raise TypeError("Expected a string as the argument")
-        if args[0] == "felsch":
-            return [tc_type.policy.strategy.felsch], overload
-        elif args[0] == "hlt":
-            return [tc_type.policy.strategy.hlt], overload
-        elif args[0] == "random":
-            return [tc_type.policy.strategy.random], overload
+        if args[1] == "felsch":
+            return [args[0], tc_type.policy.strategy.felsch], overload
+        elif args[1] == "hlt":
+            return [args[0], tc_type.policy.strategy.hlt], overload
+        elif args[1] == "random":
+            return [args[0], tc_type.policy.strategy.random], overload
         else:
             raise ValueError('Expected one of "felsch", "hlt" and "random"')
 
     def wrap_standardize(*args):
         if len(args) == 0:
             return [None], ""
+        # overload is the type of the parameter of the cpp overload
         overload = "libsemigroups::congruence::ToddCoxeter::order"
         if len(args) != 1:
             raise TypeError("Expected exactly 1 argument")
@@ -82,6 +83,18 @@ def ToddCoxeter(t):
         else:
             return "twosided"
 
+    def int_to_strategy(self, n):
+        if isinstance(n, cppyy.gbl.libsemigroups.congruence.ToddCoxeter):
+            return n
+        elif n == 0:
+            return "hlt"
+        elif n == 1:
+            return "felsch"
+        elif n == 2:
+            return "random"
+        else:
+            assert False
+
     def fp_repr_method(self):  # from froidure_pin.py
         try:
             element_type_str = "<%s>" % type(self).element_type.short_name
@@ -92,8 +105,11 @@ def ToddCoxeter(t):
             element_type_str, self.nr_generators(), plural, hex(id(self))
         )
 
-    detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
-    detail.wrap_overload_input(tc_type, tc_type.standardize, wrap_standardize)
+    detail.wrap_overload_params_and_unwrap_return_value(
+        tc_type, tc_type.strategy, wrap_strategy, int_to_strategy
+    )
+
+    detail.wrap_overload_params(tc_type, tc_type.standardize, wrap_standardize)
 
     detail.unwrap_return_value(tc_type, tc_type.kind, int_to_kind)
     detail.unwrap_return_value(

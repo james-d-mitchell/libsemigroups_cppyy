@@ -8,41 +8,83 @@ from libsemigroups_cppyy.adapters import One
 from libsemigroups_cppyy.exception import LibsemigroupsCppyyException
 
 
-def unwrap_return_value(type_nm, cpp_mem_fn, unwrap_return_fn):
-    """
-    This function unbinds the method cpp_mem_fn from its name
-    cpp_mem_fn.__name__ and installs a new method called cpp_mem_fn.__name__
-    that calls the original cpp_mem_fn, and then the function unwrap_return_fn on its
-    return value.
-    """
-
+def __new_cpp_mem_fn_name(type_nm, cpp_mem_fn):
     # make up a new name for "cpp_mem_fn"
-    cpp_mem_fn_new_name = "__" + type_nm.__name__ + "_" + cpp_mem_fn.__name__
+    return "__" + type_nm.__name__ + "_" + cpp_mem_fn.__name__
 
-    def call_and_catch(*args):
+
+def __call_and_catch(type_nm, wrap_params_fn, cpp_mem_fn, unwrap_return_fn):
+    def the_function(*args):
+        wrapped_params = wrap_params_fn(*args)
         try:
-            # The next line is extra complicated for some reason, it must be like
-            # this though
             return unwrap_return_fn(
-                args[0], getattr(args[0], cpp_mem_fn_new_name)(*args[1:])
+                args[0],
+                getattr(args[0], __new_cpp_mem_fn_name(type_nm, cpp_mem_fn))(
+                    *wrapped_params[1:]
+                ),
             )
-        except TypeError as e:
+        except Exception as e:
             raise LibsemigroupsCppyyException(e) from None
 
+    return the_function
+
+
+def __call_overload_and_catch(type_nm, wrap_params_fn, cpp_mem_fn, unwrap_return_fn):
+    def the_function(*args):
+        wrapped_params, overload = wrap_params_fn(*args)
+        try:
+            return unwrap_return_fn(
+                args[0],
+                getattr(
+                    args[0], __new_cpp_mem_fn_name(type_nm, cpp_mem_fn)
+                ).__overload__(overload)(*wrapped_params[1:]),
+            )
+        except Exception as e:
+            raise LibsemigroupsCppyyException(e) from None
+
+    return the_function
+
+
+def __do_nothing(*args):
+    return args
+
+
+def __replace_mem_fn(type_nm, cpp_mem_fn, replacement_fn):
+    """
+    """
+    cpp_mem_fn_new_name = __new_cpp_mem_fn_name(type_nm, cpp_mem_fn)
     # bind the "cpp_mem_fn" to its new name "cpp_mem_fn_new_name"
     setattr(type_nm, cpp_mem_fn_new_name, cpp_mem_fn)
     # install new version of "cpp_mem_fn.__name__" that calls the original
     # version stored in "cpp_mem_fn_new_name"
-    setattr(type_nm, cpp_mem_fn.__name__, call_and_catch)
+    setattr(type_nm, cpp_mem_fn.__name__, replacement_fn)
 
 
-def wrap_input(type_nm, cpp_mem_fn, wrap_fn):
-    # assert(not isinstance(cpp_mem_fn, cppyy.CPPOverload))
-    actual = "__" + type_nm.__name__ + "_" + cpp_mem_fn.__name__
-    setattr(type_nm, actual, cpp_mem_fn)
-    actual = getattr(type_nm, actual)
-    setattr(
-        type_nm, cpp_mem_fn.__name__, lambda *args: actual(args[0], wrap_fn(*args[1:]))
+def unwrap_return_value(type_nm, cpp_mem_fn, unwrap_return_fn):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_and_catch(type_nm, __do_nothing, cpp_mem_fn, unwrap_return_fn),
+    )
+
+
+def wrap_overload_params(type_nm, cpp_mem_fn, wrap_params_fn):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_overload_and_catch(type_nm, wrap_params_fn, cpp_mem_fn, __do_nothing),
+    )
+
+
+def wrap_overload_params_and_unwrap_return_value(
+    type_nm, cpp_mem_fn, wrap_params_fn, unwrap_return_fn
+):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_overload_and_catch(
+            type_nm, wrap_params_fn, cpp_mem_fn, unwrap_return_fn
+        ),
     )
 
 
@@ -50,26 +92,6 @@ def unwrap_return_value_to_int(type_nm, cpp_mem_fn):
     unwrap_return_value(
         type_nm, cpp_mem_fn, lambda self, x: x if isinstance(x, int) else ord(x)
     )
-
-
-def wrap_overload_input(type_nm, cpp_overload, wrap_fn):
-    # assert(isinstance(cpp_overload, cppyy.CPPOverload))
-    actual = "__" + type_nm.__name__ + "_" + cpp_overload.__name__
-    setattr(type_nm, actual, cpp_overload)
-    actual = getattr(type_nm, actual)
-
-    def inner(*args):
-        wrapped_args, overload = wrap_fn(*args[1:])
-        assert isinstance(overload, str)
-        if len(args) == 0:
-            return actual.__overload__(overload)()
-        return actual.__overload__(overload)(args[0], *wrapped_args)
-
-    setattr(type_nm, cpp_overload.__name__, inner)
-
-
-def unwrap_int(type_nm, cpp_mem_fn):
-    unwrap(type_nm, cpp_mem_fn, lambda x: x if isinstance(x, int) else ord(x))
 
 
 def generic_pow(self, n):
