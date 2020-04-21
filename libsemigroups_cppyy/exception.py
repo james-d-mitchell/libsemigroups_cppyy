@@ -13,6 +13,7 @@ class LibsemigroupsCppyyException(Exception):
                 self.short_msg = self.full_msg
             else:
                 last = self.full_msg.find("\n", first)
+                last = None if last == -1 else last
                 self.short_msg = self.full_msg[first:last]
                 self.short_msg = self.short_msg[self.short_msg.rfind(":") + 2 :]
         elif isinstance(e, str):
