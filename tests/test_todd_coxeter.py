@@ -1,6 +1,7 @@
 import unittest
 from libsemigroups_cppyy import ToddCoxeter
 
+
 class TestToddCoxeter(unittest.TestCase):
     def test_constructors(self):
         try:
@@ -20,12 +21,12 @@ class TestToddCoxeter(unittest.TestCase):
             ToddCoxeter(45)
         with self.assertRaises(ValueError):
             ToddCoxeter("lft")
-        
+
         tc = ToddCoxeter("left")
         tc.set_nr_generators(1)
         tc.add_pair([0, 0, 0, 0, 0, 0], [0, 0, 0])
         self.assertEqual(tc.nr_classes(), 5)
         self.assertEqual(tc.contains([0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0]), True)
         self.assertEqual(tc.contains([0, 0, 0], [0, 0]), False)
-        self.assertEqual(tc.kind(), 'left')
+        self.assertEqual(tc.kind(), "left")
         self.assertEqual(tc.class_index_to_word(1), [0, 0])

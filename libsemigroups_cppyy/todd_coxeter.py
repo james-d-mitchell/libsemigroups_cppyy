@@ -13,7 +13,7 @@ import cppyy.ll as ll
 
 def ToddCoxeter(t):
     if not isinstance(t, str):
-        raise TypeError('Expected a string as the argument')
+        raise TypeError("Expected a string as the argument")
     if t == "right":
         t = cppyy.gbl.libsemigroups.congruence_type.right
     elif t == "left":
@@ -31,20 +31,23 @@ def ToddCoxeter(t):
             return "-"
         else:
             return str(x.nr_generators())
+
     tc_type.__repr__ = (
-        lambda x: "<ToddCoxeter object: %s generator" % (nr_gens_str(x)) +
-        "s"[:x.nr_generators() != 1] + " and %d pair" % (x.nr_generating_pairs()) +
-        "s"[:x.nr_generating_pairs() != 1] + ">"
+        lambda x: "<ToddCoxeter object: %s generator" % (nr_gens_str(x))
+        + "s"[: x.nr_generators() != 1]
+        + " and %d pair" % (x.nr_generating_pairs())
+        + "s"[: x.nr_generating_pairs() != 1]
+        + ">"
     )
 
     def wrap_strategy(*args):
         if len(args) == 0:
-            return [None], "";
+            return [None], ""
         overload = "libsemigroups::congruence::ToddCoxeter::policy::strategy"
         if len(args) != 1:
-            raise TypeError('Expected exactly 1 argument')
+            raise TypeError("Expected exactly 1 argument")
         if not isinstance(args[0], str):
-            raise TypeError('Expected a string as the argument')
+            raise TypeError("Expected a string as the argument")
         if args[0] == "felsch":
             return [tc_type.policy.strategy.felsch], overload
         elif args[0] == "hlt":
@@ -56,12 +59,12 @@ def ToddCoxeter(t):
 
     def wrap_standardize(*args):
         if len(args) == 0:
-            return [None], "";
+            return [None], ""
         overload = "libsemigroups::congruence::ToddCoxeter::order"
         if len(args) != 1:
-            raise TypeError('Expected exactly 1 argument')
+            raise TypeError("Expected exactly 1 argument")
         if not isinstance(args[0], str):
-            raise TypeError('Expected a string as the argument')
+            raise TypeError("Expected a string as the argument")
         if args[0] == "lex":
             return [tc_type.order.lex], overload
         elif args[0] == "shortlex":
@@ -77,19 +80,24 @@ def ToddCoxeter(t):
         elif n == 1:
             return "right"
         else:
-            return "twosided"        
+            return "twosided"
 
-    detail.wrap_overload_input(
-        tc_type, tc_type.strategy, wrap_strategy
-    )
-    detail.wrap_overload_input(
-        tc_type, tc_type.standardize, wrap_standardize
-    )
-    
-    detail.unwrap_return_value(
-        tc_type, tc_type.kind, int_to_kind
-    )
+    def fp_repr_method(self):  # from froidure_pin.py
+        try:
+            element_type_str = "<%s>" % type(self).element_type.short_name
+        except AttributeError:
+            element_type_str = ""
+        plural = "s" if self.nr_generators() > 1 else ""
+        return "<FroidurePin{0} object with {1} generator{2} at {3}>".format(
+            element_type_str, self.nr_generators(), plural, hex(id(self))
+        )
+
+    detail.wrap_overload_input(tc_type, tc_type.strategy, wrap_strategy)
+    detail.wrap_overload_input(tc_type, tc_type.standardize, wrap_standardize)
+
+    detail.unwrap_return_value(tc_type, tc_type.kind, int_to_kind)
     detail.unwrap_return_value(
         tc_type, tc_type.class_index_to_word, lambda self, x: list(x)
     )
+
     return tc_type(t)
