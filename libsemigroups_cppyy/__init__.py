@@ -29,7 +29,13 @@ if "PKG_CONFIG_PATH" not in os.environ:
 
 pkg_config_path = os.environ["PKG_CONFIG_PATH"].split(":")
 
-# todo add miniconda folder
+if "CONDA_PREFIX" in os.environ:
+    conda_env_pkg_config = os.path.join(os.environ["CONDA_PREFIX"], "lib", "pkgconfig")
+    if (
+        os.path.exists(conda_env_pkg_config)
+        and not conda_env_pkg_config in pkg_config_path
+    ):
+        os.environ["PKG_CONFIG_PATH"] += ":" + conda_env_pkg_config
 
 if "/usr/local/lib/pkgconfig" not in pkg_config_path:
     os.environ["PKG_CONFIG_PATH"] += ":/usr/local/lib/pkgconfig"
