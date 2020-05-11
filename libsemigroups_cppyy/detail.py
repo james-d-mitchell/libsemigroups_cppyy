@@ -7,33 +7,124 @@ import cppyy
 from libsemigroups_cppyy.adapters import One
 from libsemigroups_cppyy.exception import LibsemigroupsCppyyException
 
+__STD = ""
+__STD_DEFINED = False
 
-def unwrap_return_value(type_nm, cpp_mem_fn, unwrap_return_fn):
-    """
-    This function unbinds the method cpp_mem_fn from its name
-    cpp_mem_fn.__name__ and installs a new method called cpp_mem_fn.__name__
-    that calls the original cpp_mem_fn, and then the function unwrap_return_fn on its
-    return value.
-    """
 
-    # make up a new name for "cpp_mem_fn"
-    cpp_mem_fn_new_name = "__" + type_nm.__name__ + "_" + cpp_mem_fn.__name__
-
-    def call_and_catch(*args):
+def std_if_required():
+    global __STD, __STD_DEFINED
+    if not __STD_DEFINED:
+        __STD_DEFINED = True
+        if not cppyy.cppdef("void dummy(std::string) {}"):
+            cppyy.cppdef("void dummy(string) {}")
         try:
-            # The next line is extra complicated for some reason, it must be like
-            # this though
+            cppyy.gbl.dummy.__overload__("std::string")
+            __STD = "std::"
+        except:
+            pass
+        del cppyy.gbl.dummy
+    return __STD
+
+
+def __new_cpp_mem_fn_name(type_nm, cpp_mem_fn):
+    # make up a new name for "cpp_mem_fn"
+    return "__" + type_nm.__name__ + "_" + cpp_mem_fn.__name__
+
+
+def __call_and_catch(type_nm, wrap_params_fn, cpp_mem_fn, unwrap_return_fn):
+    def the_function(*args):
+        wrapped_params = wrap_params_fn(*args)
+        # TODO add check that wrapped_params is a tuple
+        if not hasattr(wrapped_params, "__iter__"):
+            wrapped_params = [wrapped_params]
+        try:
             return unwrap_return_fn(
-                args[0], getattr(args[0], cpp_mem_fn_new_name)(*args[1:])
+                args[0],
+                getattr(args[0], __new_cpp_mem_fn_name(type_nm, cpp_mem_fn))(
+                    *wrapped_params
+                ),
             )
-        except TypeError as e:
+        except Exception as e:
             raise LibsemigroupsCppyyException(e) from None
 
+    return the_function
+
+
+def __call_overload_and_catch(type_nm, wrap_params_fn, cpp_mem_fn, unwrap_return_fn):
+    def the_function(*args):
+        wrapped_params, overload = wrap_params_fn(*args)
+        if not isinstance(wrapped_params, tuple):
+            raise TypeError("the function wrapping parameters must return a tuple")
+        try:
+            return unwrap_return_fn(
+                args[0],
+                getattr(
+                    args[0], __new_cpp_mem_fn_name(type_nm, cpp_mem_fn)
+                ).__overload__(overload)(*wrapped_params),
+            )
+        except Exception as e:
+            raise LibsemigroupsCppyyException(e) from None
+
+    return the_function
+
+
+def __do_nothing_to_params(self, *args):
+    return args
+
+
+def __do_nothing_to_return_value(self, args):
+    return args
+
+
+def __replace_mem_fn(type_nm, cpp_mem_fn, replacement_fn):
+    """
+    """
+    cpp_mem_fn_new_name = __new_cpp_mem_fn_name(type_nm, cpp_mem_fn)
     # bind the "cpp_mem_fn" to its new name "cpp_mem_fn_new_name"
     setattr(type_nm, cpp_mem_fn_new_name, cpp_mem_fn)
     # install new version of "cpp_mem_fn.__name__" that calls the original
     # version stored in "cpp_mem_fn_new_name"
-    setattr(type_nm, cpp_mem_fn.__name__, call_and_catch)
+    setattr(type_nm, cpp_mem_fn.__name__, replacement_fn)
+
+
+def unwrap_return_value(type_nm, cpp_mem_fn, unwrap_return_fn):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_and_catch(type_nm, __do_nothing_to_params, cpp_mem_fn, unwrap_return_fn),
+    )
+
+
+def wrap_params(type_nm, cpp_mem_fn, wrap_params_fn):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_and_catch(
+            type_nm, wrap_params_fn, cpp_mem_fn, __do_nothing_to_return_value
+        ),
+    )
+
+
+def wrap_overload_params(type_nm, cpp_mem_fn, wrap_params_fn):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_overload_and_catch(
+            type_nm, wrap_params_fn, cpp_mem_fn, __do_nothing_to_return_value
+        ),
+    )
+
+
+def wrap_overload_params_and_unwrap_return_value(
+    type_nm, cpp_mem_fn, wrap_params_fn, unwrap_return_fn
+):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_overload_and_catch(
+            type_nm, wrap_params_fn, cpp_mem_fn, unwrap_return_fn
+        ),
+    )
 
 
 def unwrap_return_value_to_int(type_nm, cpp_mem_fn):
@@ -80,6 +171,7 @@ def runner__next__(self):
 
 
 class RandomAccessRange:
+    # TODO add keyword arg unwrap_return_value for KnuthBendix::rules
     def __init__(self, first, last):
         self.first = first
         self.last = last
