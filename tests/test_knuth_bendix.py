@@ -9,6 +9,13 @@ from libsemigroups_cppyy import (
     milliseconds,
 )
 import cppyy.ll as ll
+from fpsemi_intf import (
+    check_validation,
+    check_initialisation,
+    check_operators,
+    check_attributes,
+    check_converters,
+)
 
 
 class TestKnuth(unittest.TestCase):
@@ -70,80 +77,13 @@ class TestKnuth(unittest.TestCase):
             )
 
     def test_validation(self):
-        ReportGuard(False)
-        kb = KnuthBendix()
-        kb.set_alphabet("ab")
-
-        with self.assertRaises(TypeError):
-            kb.validate_letter("c")
-        try:
-            kb.validate_letter("a")
-        except Exception as e:
-            self.fail(
-                "unexpected exception raised for KnuthBendix::validate_letter: " + e
-            )
-
-        with self.assertRaises(LibsemigroupsException):
-            kb.validate_letter(3)
-        try:
-            kb.validate_letter(0)
-        except Exception as e:
-            self.fail(
-                "unexpected exception raised for KnuthBendix::validate_letter: " + e
-            )
-
-        with self.assertRaises(TypeError):
-            kb.validate_word("abc")
-        try:
-            kb.validate_word("abab")
-        except Exception as e:
-            self.fail(
-                "unexpected exception raised for KnuthBendix::validate_letter: " + e
-            )
-
-        with self.assertRaises(TypeError):
-            kb.validate_word([0, 1, 2])
-        try:
-            kb.validate_word([0, 1, 0, 1])
-        except Exception as e:
-            self.fail(
-                "unexpected exception raised for KnuthBendix::validate_letter: " + e
-            )
+        check_validation(self, KnuthBendix)
 
     def test_converters(self):
-        ReportGuard(False)
-        kb = KnuthBendix()
-        kb.set_alphabet("ba")
-        self.assertEqual(kb.char_to_uint(ord("a")), 1)
-        self.assertEqual(kb.char_to_uint(ord("b")), 0)
-
-        self.assertEqual(kb.string_to_word("ab"), [1, 0])
-        self.assertEqual(kb.string_to_word("aaaaaa"), [1] * 6)
-        with self.assertRaises(LibsemigroupsCppyyException):
-            kb.string_to_word("c")
-
-        self.assertEqual(kb.uint_to_char(0), "b")
-        self.assertEqual(kb.uint_to_char(1), "a")
-        with self.assertRaises(LibsemigroupsException):
-            kb.uint_to_char(2)
-
-        self.assertEqual(kb.word_to_string([1, 0]), "ab")
-        self.assertEqual(kb.word_to_string([1] * 6), "a" * 6)
-        with self.assertRaises(LibsemigroupsException):
-            kb.word_to_string([2])
+        check_converters(self, KnuthBendix)
 
     def test_initialisation(self):
-        ReportGuard(False)
-        kb = KnuthBendix()
-        kb.set_alphabet("ba")
-        kb.add_rule([0, 1], [1, 0])
-
-        with self.assertRaises(TypeError):
-            kb.add_rule([0, 1], [2])
-
-        S = FroidurePin(Transformation([1, 2, 0]), Transformation([1, 0, 2]))
-        kb.add_rules(S)
-        self.assertEqual(kb.size(), 2)
+        check_initialisation(self, KnuthBendix)
 
         kb = KnuthBendix()
         kb.set_alphabet("abB")
@@ -154,12 +94,10 @@ class TestKnuth(unittest.TestCase):
         kb.add_rule("BaBa", "abab")
         self.assertEqual(kb.size(), 24)
 
-        kb = KnuthBendix()
-        kb.set_alphabet(1)
-        kb.set_identity(0)
-        self.assertEqual(kb.size(), 1)
-
     def test_attributes(self):
+        # Check FpSemigroupInterface general attributes
+        check_attributes(self, KnuthBendix)
+        # Check KnuthBendix specific attributes
         ReportGuard(False)
         kb = KnuthBendix()
         kb.set_alphabet("abB")
@@ -168,23 +106,10 @@ class TestKnuth(unittest.TestCase):
 
         kb.add_rule("bb", "B")
         kb.add_rule("BaBa", "abab")
+
         self.assertFalse(kb.confluent())
         kb.run()
         self.assertTrue(kb.confluent())
-
-        self.assertEqual(
-            kb.rules(),
-            [
-                ["aa", ""],
-                ["aa", ""],
-                ["bB", ""],
-                ["Bb", ""],
-                ["Bb", ""],
-                ["bB", ""],
-                ["bb", "B"],
-                ["BaBa", "abab"],
-            ],
-        )
 
         self.assertEqual(
             kb.active_rules(),
@@ -202,23 +127,7 @@ class TestKnuth(unittest.TestCase):
                 ["baBaba", "abaBab"],
             ],
         )
-        self.assertEqual(kb.alphabet(), "abB")
-        self.assertFalse(kb.has_froidure_pin())
-        self.assertEqual(kb.froidure_pin().size(), 24)
-        self.assertEqual(kb.identity(), "")
-        self.assertEqual(kb.inverses(), "aBb")
-        self.assertFalse(kb.is_obviously_infinite())
-        self.assertTrue(kb.is_obviously_finite())
         self.assertEqual(kb.nr_active_rules(), 11)
-        self.assertEqual(kb.nr_rules(), 8)
-        self.assertEqual(kb.size(), 24)
-
-        # TBA in v1.1.0 of libsemigroups
-        # self.assertEqual(kb.alphabet(0), "a")
-        # self.assertEqual(kb.alphabet(1), "b")
-        # self.assertEqual(kb.alphabet(2), "B")
-        # with self.assertRaises(TypeError):
-        #     self.assertEqual(kb.alphabet(3), "B")
 
     def test_settings(self):
         ReportGuard(False)
@@ -293,34 +202,4 @@ class TestKnuth(unittest.TestCase):
         self.assertFalse(kb.timed_out())
 
     def test_operators(self):
-        kb = KnuthBendix()
-        kb.set_alphabet("abB")
-        kb.set_identity("")
-        kb.set_inverses("aBb")
-
-        kb.add_rule("bb", "B")
-        kb.add_rule("BaBa", "abab")
-        kb.run()
-        self.assertTrue(kb.equal_to("bb", "B"))
-        self.assertTrue(kb.equal_to([1, 1], [2]))
-
-        with self.assertRaises(TypeError):
-            kb.equal_to([1, 1], [3])
-        with self.assertRaises(TypeError):
-            kb.equal_to("aa", "z")
-
-        self.assertEqual(kb.normal_form("bb"), "B")
-        self.assertEqual(kb.normal_form("B"), "B")
-        self.assertEqual(kb.normal_form([1, 1]), [2])
-        self.assertEqual(kb.normal_form([0, 0]), [])
-
-        with self.assertRaises(LibsemigroupsCppyyException):
-            kb.normal_form([1, 3])
-        with self.assertRaises(LibsemigroupsCppyyException):
-            kb.normal_form("z")
-
-        self.assertEqual(kb.rewrite("aa"), "")
-        self.assertEqual(kb.rewrite("bb"), "B")
-
-        with self.assertRaises(TypeError):
-            self.assertEqual(kb.rewrite("z"))
+        check_operators(self, KnuthBendix)

@@ -1,7 +1,5 @@
 black: 
-	black setup.py
-	black libsemigroups_cppyy/*.py
-	black tests/*.py
+	black setup.py libsemigroups_cppyy/*.py tests/*.py
 
 check:
 	tox -- -x tests/

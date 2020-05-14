@@ -9,8 +9,8 @@ for further details.
 import cppyy
 import libsemigroups_cppyy.detail as detail
 from libsemigroups_cppyy.detail import RandomAccessRange
-from libsemigroups_cppyy.detail import std_if_required
 from libsemigroups_cppyy.froidure_pin import install_froidure_pin_methods
+from libsemigroups_cppyy.fpsemi_intf import replace_normal_form
 
 cppyy.cppdef(
     """
@@ -26,8 +26,7 @@ namespace libsemigroups_cppyy {
 )
 
 
-def KnuthBendix():
-    kb_type = cppyy.gbl.libsemigroups.fpsemigroup.KnuthBendix
+def install_knuth_bendix_methods(kb_type):
     kb_type.__repr__ = lambda x: "<KnuthBendix: %d letters and %d rules>" % (
         len(x.alphabet()),
         x.nr_active_rules(),
@@ -61,19 +60,12 @@ def KnuthBendix():
         else:
             raise ValueError('expected one of "ABC", "AB_BC", or "MAX_AB_BC"')
 
-    def normal_form_unwrap(self, x):
-        if isinstance(x, str):
-            return x
-        return list(x)
-
-    def normal_form_wrap(self, x):
-        if isinstance(x, list):
-            return (x,), "const %svector<unsigned long>&" % std_if_required()
-        return (x,), "const %sstring&" % std_if_required()
-
     detail.wrap_params(kb_type, kb_type.overlap_policy, overlap_policy_wrapper)
-    detail.wrap_overload_params_and_unwrap_return_value(
-        kb_type, kb_type.normal_form, normal_form_wrap, normal_form_unwrap
-    )
+    replace_normal_form(kb_type)
+
+
+def KnuthBendix():
+    kb_type = cppyy.gbl.libsemigroups.fpsemigroup.KnuthBendix
+    install_knuth_bendix_methods(kb_type)
 
     return kb_type()

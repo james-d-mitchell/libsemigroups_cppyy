@@ -95,6 +95,16 @@ def unwrap_return_value(type_nm, cpp_mem_fn, unwrap_return_fn):
     )
 
 
+def wrap_params_and_unwrap_return_value(
+    type_nm, cpp_mem_fn, wrap_params_fn, unwrap_return_fn
+):
+    __replace_mem_fn(
+        type_nm,
+        cpp_mem_fn,
+        __call_and_catch(type_nm, wrap_params_fn, cpp_mem_fn, unwrap_return_fn),
+    )
+
+
 def wrap_params(type_nm, cpp_mem_fn, wrap_params_fn):
     __replace_mem_fn(
         type_nm,

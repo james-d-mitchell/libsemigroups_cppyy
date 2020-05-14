@@ -96,17 +96,7 @@ sys.stdout = stdout
 cppyy.cppdef("#define FMT_HEADER_ONLY")
 cppyy.cppdef("#define HPCOMBI_CONSTEXPR_FUN_ARGS")
 
-cppyy.include("libsemigroups/action.hpp")
-cppyy.include("libsemigroups/bmat8.hpp")
-cppyy.include("libsemigroups/cong-pair.hpp")
-cppyy.include("libsemigroups/element.hpp")
-cppyy.include("libsemigroups/element-helper.hpp")
-cppyy.include("libsemigroups/froidure-pin.hpp")
-cppyy.include("libsemigroups/fpsemi.hpp")
-cppyy.include("libsemigroups/kbe.hpp")
-cppyy.include("libsemigroups/knuth-bendix.hpp")
-cppyy.include("libsemigroups/schreier-sims.hpp")
-cppyy.include("libsemigroups/report.hpp")
+cppyy.include("libsemigroups/libsemigroups.hpp")
 
 cppyy.gbl.libsemigroups
 
