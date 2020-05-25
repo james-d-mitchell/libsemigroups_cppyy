@@ -172,6 +172,7 @@ def runner__iter__(self):
 
 
 def runner__next__(self):
+    assert cppyy.gbl.std.distance(self.cbegin(), self.cend()) == self.size(), "something bad"
     if self.it != self.cend():
         out = self.it.__deref__()
         cppyy.gbl.std.advance(self.it, 1)
