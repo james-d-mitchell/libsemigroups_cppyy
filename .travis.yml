@@ -7,12 +7,21 @@ language: python
 services:
   - docker
 
+jobs:
+  include:
+    - env: LIBSEMIGROUPS_VERSION=version-1.0.9
+
 before_install:
-- docker pull libsemigroups/libsemigroups_cppyy
-- ID=$(docker run --rm -i -t -d libsemigroups/libsemigroups_cppyy)
-- docker cp . "$ID":/home/libsemigroups/libsemigroups_cppyy_github
-- docker exec -it "$ID" sudo chown 1000:1000 -R ../libsemigroups_cppyy_github
+- export CONTAINER_NAME=libsemigroups/libsemigroups-docker:$LIBSEMIGROUPS_VERSION
+- export EXTRA_PATH="/home/libsemigroups/.local/bin/"
+- export EXTRA_LD_LIBRARY_PATH="/usr/local/lib/"
+- docker pull $CONTAINER_NAME 
+- ID=$(docker run --env EXTRA_PATH --env EXTRA_LD_LIBRARY_PATH --rm -i -t -d $CONTAINER_NAME)
+- docker cp . "$ID":/home/libsemigroups/libsemigroups_cppyy
+- docker exec -it "$ID" sudo chown 1000:1000 -R libsemigroups_cppyy
+- docker exec -it "$ID" sudo apt-get install -y python3-pip vim
+- docker exec -it "$ID" pip3 install cppyy tox pkgconfig
 
 script:
-- docker exec -it "$ID" /bin/sh -c "cd ../libsemigroups_cppyy_github && tox -- -x tests && exit"
+- docker exec -it "$ID" /bin/sh -c "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$EXTRA_LD_LIBRARY_PATH && export PATH=$PATH:$EXTRA_PATH && cd libsemigroups_cppyy && tox -- -x tests && exit"
 - docker stop "$ID"
