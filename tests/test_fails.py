@@ -1,11 +1,7 @@
 import unittest
-from libsemigroups_cppyy import (
-    FroidurePin,
-    FpSemigroup,
-    Transformation,
-    ReportGuard
-)
+from libsemigroups_cppyy import FroidurePin, FpSemigroup, Transformation, ReportGuard
 import cppyy.gbl.std as std
+
 
 class TestBug(unittest.TestCase):
     def test_bug1_works_yes(self):
@@ -40,6 +36,3 @@ class TestBug(unittest.TestCase):
         S = FroidurePin(Transformation([1, 0, 1]), Transformation([0, 0, 0]))
         self.assertEqual(S.size(), 4)
         self.assertEqual(std.distance(S.cbegin(), S.cend()), S.size())
-
-        
-    

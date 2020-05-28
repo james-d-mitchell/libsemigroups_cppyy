@@ -172,7 +172,6 @@ def runner__iter__(self):
 
 
 def runner__next__(self):
-    assert cppyy.gbl.std.distance(self.cbegin(), self.cend()) == self.size(), "something bad"
     if self.it != self.cend():
         out = self.it.__deref__()
         cppyy.gbl.std.advance(self.it, 1)
@@ -181,7 +180,34 @@ def runner__next__(self):
         raise StopIteration
 
 
+class ForwardRange:
+    def __init__(self, first, last):
+        self.first = first
+        self.last = last
+
+    def __repr__(self):
+        return "<forward range at {0}>".format(hex(id(self)), len(self))
+
+    def __iter__(self):
+        self.it = self.first
+        return self
+
+    def __next__(self):
+        if self.it != self.last:
+            reference = self.it.__deref__()
+            # copy "reference" since it may be a reference
+            # Can't currently check this because
+            # cppyy.gbl.std.is_reference(S.cbegin_rules().__deref__()).value
+            # returns 0 at present
+            out = type(reference)(reference)
+            cppyy.gbl.std.advance(self.it, 1)
+            return out
+        else:
+            raise StopIteration
+
+
 class RandomAccessRange:
+    # TODO subclass ForwardRange?
     # TODO add keyword arg unwrap_return_value for KnuthBendix::rules
     def __init__(self, first, last):
         self.first = first

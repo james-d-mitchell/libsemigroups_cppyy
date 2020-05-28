@@ -19,15 +19,21 @@ from fpsemi_intf import (
 
 import cppyy.gbl.std as std
 
+
 class TestFpSemigroup(unittest.TestCase):
     def test_aaa_bug(self):
         S = FroidurePin(Transformation([1, 0, 1]), Transformation([0, 0, 0]))
         S.run()
         self.assertEqual(std.distance(S.cbegin(), S.cend()), 4)
-        self.assertEqual(list(S), [Transformation([1, 0, 1]),
-                                    Transformation([0, 0, 0]),
-                                    Transformation([0, 1, 0]),
-                                    Transformation([1, 1, 1])])
+        self.assertEqual(
+            list(S),
+            [
+                Transformation([1, 0, 1]),
+                Transformation([0, 0, 0]),
+                Transformation([0, 1, 0]),
+                Transformation([1, 1, 1]),
+            ],
+        )
 
     def test_all(self):
         ReportGuard(False)
@@ -62,7 +68,20 @@ class TestFpSemigroup(unittest.TestCase):
         self.assertFalse(T.has_froidure_pin())
         if compare_version_numbers(libsemigroups_version(), "1.1.0"):
             self.assertEqual(S.nr_rules(), T.nr_rules())
-            self.assertEqual(T.rules(), S.rules())
+            self.assertEqual(
+                S.rules(),
+                [[[0, 1], [1]], [[1, 1], [1]], [[0, 0, 0], [0]], [[1, 0, 0], [1]]],
+            )
+            self.assertEqual(
+                T.rules(),
+                [
+                    ["\x01\x02", "\x02"],
+                    ["\x02\x02", "\x02"],
+                    ["\x01\x01\x01", "\x01"],
+                    ["\x02\x01\x01", "\x02"],
+                ],
+            )
+
         self.assertEqual(T.size(), S.size())
 
     # Common tests for FpSemigroupInterface derived classes

@@ -12,6 +12,7 @@ from libsemigroups_cppyy import (
 )
 import cppyy.gbl.std as std
 
+
 class TestFroidurePin(unittest.TestCase):
     def test_init(self):
         ReportGuard(False)
@@ -29,7 +30,10 @@ class TestFroidurePin(unittest.TestCase):
     def test_idempotents(self):
         S = FroidurePin(Transformation([1, 0, 1]), Transformation([0, 0, 0]))
         S.run()
-        self.assertEqual(std.distance(S.cbegin_idempotents(), S.cend_idempotents()), S.nr_idempotents())
+        self.assertEqual(
+            std.distance(S.cbegin_idempotents(), S.cend_idempotents()),
+            S.nr_idempotents(),
+        )
 
         self.assertEqual(
             list(S.idempotents()),
@@ -242,6 +246,15 @@ class TestFroidurePin(unittest.TestCase):
             S.word_to_element([0, 1, 0, 1]), Transformation([0, 3, 4, 1, 2])
         )
         self.assertEqual(S.word_to_pos([0, 1, 0, 1]), 15)
+        
+        S = FroidurePin(Transformation([1, 0, 1]), Transformation([0, 0, 0]))
+        S.run()
+        if compare_version_numbers(libsemigroups_version(), "1.1.0"):
+            self.assertEqual(
+                S.rules(),
+                [[[0, 1], [1]], [[1, 1], [1]], [[0, 0, 0], [0]], [[1, 0, 0], [1]]],
+            )
+
 
     def test_prefixes_and_suffixes(self):
         S = FroidurePin(Transformation(list(range(1, 5)) + [0]))

@@ -10,6 +10,7 @@ services:
 jobs:
   include:
     - env: LIBSEMIGROUPS_VERSION=version-1.0.9
+    - env: LIBSEMIGROUPS_VERSION=version-1.1.0
 
 before_install:
 - export CONTAINER_NAME=libsemigroups/libsemigroups-docker:$LIBSEMIGROUPS_VERSION

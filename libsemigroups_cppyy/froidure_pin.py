@@ -10,8 +10,10 @@ import cppyy
 import libsemigroups_cppyy.detail as detail
 import networkx
 
-from libsemigroups_cppyy.detail import RandomAccessRange
+from libsemigroups_cppyy.detail import RandomAccessRange, ForwardRange
 from libsemigroups_cppyy.detail import method_causes_segfault
+
+from cppyy.gbl.std import vector
 
 
 def install_froidure_pin_methods(froidure_pin_type):
@@ -50,6 +52,11 @@ def install_froidure_pin_methods(froidure_pin_type):
         )
 
     froidure_pin_type.__repr__ = repr_method
+
+    froidure_pin_type.rules = lambda self: [
+        [list(x.first), list(x.second)]
+        for x in ForwardRange(self.cbegin_rules(), self.cend_rules())
+    ]
 
     # JDM the following didn't work for whatever reason:
     method_causes_segfault(froidure_pin_type, "add_generators")
