@@ -8,8 +8,8 @@ setup(
     version="0.0.1",
     description="A minimal cppyy wrapper for the libsemigroups C++ library",
     url="http://github.com/libsemigroups/libsemigroups_cppyy",
-    author="James D. Mitchell, Nicolas Thiéry",
-    author_email="jdm3@st-andrews.ac.uk, Nicolas.Thiery@u-psud.fr",
+    author="James D. Mitchell, Nicolas Thiéry, Murray T. Whyte",
+    author_email="jdm3@st-andrews.ac.uk, Nicolas.Thiery@u-psud.fr, mw231@st-andrews.ac.uk",
     license="GPL3",
     install_requires=[
         "cppyy>=1.6.1",

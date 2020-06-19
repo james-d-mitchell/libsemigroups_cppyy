@@ -125,6 +125,7 @@ from libsemigroups_cppyy.perm import *
 from libsemigroups_cppyy.pperm import *
 from libsemigroups_cppyy.schreier_sims import SchreierSims
 from libsemigroups_cppyy.transf import *
+from libsemigroups_cppyy.todd_coxeter import ToddCoxeter
 
 microseconds = cppyy.gbl.std.chrono.microseconds
 milliseconds = cppyy.gbl.std.chrono.milliseconds
