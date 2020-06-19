@@ -129,26 +129,7 @@ def check_attributes(self, t):
     x.add_rule("BaBa", "abab")
     x.run()
 
-    if compare_version_numbers(libsemigroups_version(), "1.1.1"):
-        self.assertEqual(
-            x.rules(),
-            [
-                ["ae", "a"],
-                ["ea", "a"],
-                ["be", "b"],
-                ["eb", "b"],
-                ["Be", "B"],
-                ["eB", "B"],
-                ["ee", "e"],
-                ["aa", "e"],
-                ["bB", "e"],
-                ["Bb", "e"],
-                ["bb", "B"],
-                ["BaBa", "abab"],
-            ],
-        )
-        self.assertEqual(x.nr_rules(), 12)
-    else:
+    if compare_version_numbers("1.1.0", libsemigroups_version()):
         self.assertEqual(
             x.rules(),
             [
@@ -172,7 +153,25 @@ def check_attributes(self, t):
             ],
         )
         self.assertEqual(x.nr_rules(), 17)
-
+    else:
+        self.assertEqual(
+            x.rules(),
+            [
+                ["ae", "a"],
+                ["ea", "a"],
+                ["be", "b"],
+                ["eb", "b"],
+                ["Be", "B"],
+                ["eB", "B"],
+                ["ee", "e"],
+                ["aa", "e"],
+                ["bB", "e"],
+                ["Bb", "e"],
+                ["bb", "B"],
+                ["BaBa", "abab"],
+            ],
+        )
+        self.assertEqual(x.nr_rules(), 12)
 
     self.assertEqual(x.alphabet(), "abBe")
     self.assertFalse(x.has_froidure_pin())
