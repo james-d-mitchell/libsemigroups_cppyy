@@ -75,6 +75,27 @@ elif not compare_version_numbers(
         )
     )
 
+# Try to use pkg-config to add the path to libsemigroups.so etc to
+# LD_LIBRARY_PATH so that cppyy can find it. We only try to do this, and ignore
+# it if it fails, because it's sometime possible to cppyy.load_library even
+# though the path to libsemigroups.so etc is not in LD_LIBRARY_PATH. This is
+# the case, for example, on JDM's computer.
+try:
+    library_path = pkgconfig.pkgconfig._query("libsemigroups", "--libs-only-L")
+    if library_path[:2] != "-L":
+        raise
+    else:
+        library_path = library_path[2:]
+    if os.path.exists(library_path):
+        if "LD_LIBRARY_PATH" in os.environ and len(os.environ["LD_LIBRARY_PATH"]) != 0:
+            LD_LIBRARY_PATH = os.environ["LD_LIBRARY_PATH"]
+            if LD_LIBRARY_PATH.find(library_path) == -1:
+                prefix = "" if LD_LIBRARY_PATH[-1] is ":" else ":"
+                os.environ["LD_LIBRARY_PATH"] += prefix + library_path
+        else:
+            os.environ["LD_LIBRARY_PATH"] = library_path
+except:
+    pass
 
 import cppyy
 import sys
